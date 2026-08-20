@@ -76,7 +76,7 @@ def build_payload(keyword: str, page: int = 1, page_size: int = 30) -> Dict[str,
                     "country": "ID",
                     "locale": "id-ID",
                     "text": keyword,
-                    "sort": "listedAt",
+                    "sort": "score",
                 },
                 "searchContext": {
                     "brand": "jobstreet",
