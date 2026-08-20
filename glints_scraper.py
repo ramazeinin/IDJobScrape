@@ -81,6 +81,7 @@ def flatten_job_record(role_searched: str, job: dict) -> dict:
         "Max Salary": max_salary,
         "Skills": skills,
         "Posted Date": job.get("createdAt", ""),
+        "Updated Date": job.get("updatedAt", ""),
         "Status": job.get("status", ""),
         "Is Hot": job.get("isHot", False),
     }
