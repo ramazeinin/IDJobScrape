@@ -26,20 +26,36 @@ jobs:
         run: |
           python glints_scraper.py
 
+      - name: Run JobStreet Scraper
+        run: |
+          python jobstreet_scraper.py
+
       - name: Prepare GSheet Command Payload
         id: prepare_payload
         run: |
-          jq -c '[
-            {
-              command: "updateData",
-              args: {
-                worksheetTitle: "Glints",
-                minRow: 1,
-                minCol: 1,
-                data: .
+          jq -n \
+            --slurpfile glints gsheet_data.json \
+            --slurpfile jobstreet gsheet_jobstreet_data.json \
+            '[
+              {
+                command: "updateData",
+                args: {
+                  worksheetTitle: "Glints",
+                  minRow: 1,
+                  minCol: 1,
+                  data: $glints[0]
+                }
+              },
+              {
+                command: "updateData",
+                args: {
+                  worksheetTitle: "Jobstreet",
+                  minRow: 1,
+                  minCol: 1,
+                  data: $jobstreet[0]
+                }
               }
-            }
-          ]' gsheet_data.json > commands.json
+            ]' > commands.json
 
           echo "commands<<EOF" >> $GITHUB_OUTPUT
           cat commands.json >> $GITHUB_OUTPUT
