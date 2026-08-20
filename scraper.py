@@ -146,20 +146,22 @@ async def main():
     output_csv = Path("jobs_tabular.csv")
     output_json = Path("jobs_tabular.json")
 
+    # Save formatted 2D list for gsheet.action
     if all_flattened_rows:
         fieldnames = list(all_flattened_rows[0].keys())
+        
+        # 1. First row: Headers
+        # 2. Remaining rows: Value lists
+        sheet_matrix = [fieldnames] + [
+            [str(row.get(k, "")) for k in fieldnames] 
+            for row in all_flattened_rows
+        ]
 
-        # Save as CSV
-        with open(output_csv, "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(all_flattened_rows)
+        # Save as 2D JSON matrix
+        with open("gsheet_data.json", "w", encoding="utf-8") as f:
+            json.dump(sheet_matrix, f, ensure_ascii=False)
 
-        # Save as JSON
-        with open(output_json, "w", encoding="utf-8") as f:
-            json.dump(all_flattened_rows, f, indent=2, ensure_ascii=False)
-
-        print(f"[✓] Saved {len(all_flattened_rows)} flattened rows to {output_csv} and {output_json}")
+        print(f"[✓] Saved {len(sheet_matrix)} rows for GSheet Action")
 
 
 if __name__ == "__main__":
