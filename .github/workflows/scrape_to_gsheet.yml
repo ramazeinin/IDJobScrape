@@ -31,7 +31,6 @@ jobs:
           python jobstreet_scraper.py
 
       - name: Prepare GSheet Command Payload
-        id: prepare_payload
         run: |
           jq -n \
             --slurpfile glints gsheet_data.json \
@@ -57,15 +56,11 @@ jobs:
               }
             ]' > commands.json
 
-          echo "commands<<EOF" >> $GITHUB_OUTPUT
-          cat commands.json >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
       - name: Update Google Sheet
         uses: jroehl/gsheet.action@v2.1.1
         with:
           spreadsheetId: ${{ secrets.SPREADSHEET_ID }}
-          commands: ${{ steps.prepare_payload.outputs.commands }}
+          commands: "@commands.json"
         env:
           GSHEET_CLIENT_EMAIL: ${{ secrets.GSHEET_CLIENT_EMAIL }}
           GSHEET_PRIVATE_KEY: ${{ secrets.GSHEET_PRIVATE_KEY }}
