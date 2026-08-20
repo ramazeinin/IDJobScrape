@@ -33,7 +33,7 @@ jobs:
           jq -c '{
             commands: [
               {
-                command: "updateData",
+                command: "appendData",
                 args: {
                   worksheetTitle: "Sheet1",
                   minRow: 1,
@@ -44,7 +44,7 @@ jobs:
             ]
           }' gsheet_data.json > gsheet_commands.json
 
-      - name: Update Google Sheet
+      - name: Append Google Sheet
         uses: jroehl/gsheet.action@v2.1.1
         with:
           spreadsheetId: ${{ secrets.SPREADSHEET_ID }}
