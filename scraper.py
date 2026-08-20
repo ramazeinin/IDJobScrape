@@ -1,7 +1,5 @@
 import asyncio
-import csv
 import json
-import re
 from pathlib import Path
 from wreq import Client, Emulation
 from wreq.header import HeaderMap
@@ -142,26 +140,21 @@ async def main():
         all_flattened_rows.extend(rows)
         await asyncio.sleep(1.0)
 
-    # Save to a single flat CSV and JSON for GSheet action
-    output_csv = Path("jobs_tabular.csv")
-    output_json = Path("jobs_tabular.json")
+    # Save only the 2D matrix JSON required by gsheet.action
+    output_gsheet = Path("gsheet_data.json")
 
-    # Save formatted 2D list for gsheet.action
     if all_flattened_rows:
         fieldnames = list(all_flattened_rows[0].keys())
-        
-        # 1. First row: Headers
-        # 2. Remaining rows: Value lists
+
         sheet_matrix = [fieldnames] + [
-            [str(row.get(k, "")) for k in fieldnames] 
+            [str(row.get(k, "")) for k in fieldnames]
             for row in all_flattened_rows
         ]
 
-        # Save as 2D JSON matrix
-        with open("gsheet_data.json", "w", encoding="utf-8") as f:
+        with open(output_gsheet, "w", encoding="utf-8") as f:
             json.dump(sheet_matrix, f, ensure_ascii=False)
 
-        print(f"[✓] Saved {len(sheet_matrix)} rows for GSheet Action")
+        print(f"[✓] Successfully exported {len(all_flattened_rows)} records to {output_gsheet}")
 
 
 if __name__ == "__main__":
