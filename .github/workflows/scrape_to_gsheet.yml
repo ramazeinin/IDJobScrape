@@ -30,37 +30,58 @@ jobs:
         run: |
           python jobstreet_scraper.py
 
-      - name: Prepare GSheet Command Payload
+      - name: Prepare Glints Payload
+        id: prepare_glints_payload
         run: |
-          jq -n \
-            --slurpfile glints gsheet_data.json \
-            --slurpfile jobstreet gsheet_jobstreet_data.json \
-            '[
-              {
-                command: "updateData",
-                args: {
-                  worksheetTitle: "Glints",
-                  minRow: 1,
-                  minCol: 1,
-                  data: $glints[0]
-                }
-              },
-              {
-                command: "updateData",
-                args: {
-                  worksheetTitle: "Jobstreet",
-                  minRow: 1,
-                  minCol: 1,
-                  data: $jobstreet[0]
-                }
+          jq -c '[
+            {
+              command: "updateData",
+              args: {
+                worksheetTitle: "Glints",
+                minRow: 1,
+                minCol: 1,
+                data: .
               }
-            ]' > commands.json
+            }
+          ]' gsheet_data.json > glints_commands.json
 
-      - name: Update Google Sheet
+          echo "commands<<EOF" >> $GITHUB_OUTPUT
+          cat glints_commands.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Update Glints Sheet
         uses: jroehl/gsheet.action@v2.1.1
         with:
           spreadsheetId: ${{ secrets.SPREADSHEET_ID }}
-          commands: "@commands.json"
+          commands: ${{ steps.prepare_glints_payload.outputs.commands }}
+        env:
+          GSHEET_CLIENT_EMAIL: ${{ secrets.GSHEET_CLIENT_EMAIL }}
+          GSHEET_PRIVATE_KEY: ${{ secrets.GSHEET_PRIVATE_KEY }}
+
+      - name: Prepare JobStreet Payload
+        id: prepare_jobstreet_payload
+        run: |
+          jq -c '[
+            {
+              command: "updateData",
+              args: {
+                worksheetTitle: "Jobstreet",
+                minRow: 1,
+                minCol: 1,
+                data: .
+              }
+            }
+          ]' gsheet_jobstreet_data.json > jobstreet_commands.json
+
+          echo "commands<<EOF" >> $GITHUB_OUTPUT
+          cat jobstreet_commands.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Update JobStreet Sheet
+        uses: jroehl/gsheet.action@v2.1.1
+        with:
+          spreadsheetId: ${{ secrets.SPREADSHEET_ID }}
+          commands: ${{ steps.prepare_jobstreet_payload.outputs.commands }}
         env:
           GSHEET_CLIENT_EMAIL: ${{ secrets.GSHEET_CLIENT_EMAIL }}
           GSHEET_PRIVATE_KEY: ${{ secrets.GSHEET_PRIVATE_KEY }}
