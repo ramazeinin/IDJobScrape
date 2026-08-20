@@ -20,22 +20,20 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install wreq
+          pip install -r requirements.txt || pip install wreq
 
-      - name: Run Scraper
+      - name: Run Glints Scraper
         run: |
-          # Use the exact filename of your script (e.g. scraper.py or main.py)
-          python scraper.py
+          python glints_scraper.py
 
       - name: Prepare GSheet Command Payload
         id: prepare_payload
         run: |
-          # 1. Format the 2D JSON matrix into the gsheet.action commands structure
           jq -c '[
             {
               command: "updateData",
               args: {
-                worksheetTitle: "Sheet1",
+                worksheetTitle: "Glints",
                 minRow: 1,
                 minCol: 1,
                 data: .
@@ -43,7 +41,6 @@ jobs:
             }
           ]' gsheet_data.json > commands.json
 
-          # 2. Export commands directly to GITHUB_OUTPUT using multiline syntax
           echo "commands<<EOF" >> $GITHUB_OUTPUT
           cat commands.json >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
