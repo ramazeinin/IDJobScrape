@@ -1,0 +1,45 @@
+name: Scrape Jobs and Sync to Google Sheet
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *' # Run daily at midnight UTC
+
+jobs:
+  scrape-and-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install wreq
+
+      - name: Run Job Scraper
+        run: |
+          python main.py
+
+      - name: Upload Tabular Data to Google Sheet
+        uses: marketplace/actions/gsheet-action@v1
+        with:
+          spreadsheetId: ${{ secrets.SPREADSHEET_ID }}
+          commands: |
+            [
+              {
+                "command": "appendData",
+                "args": {
+                  "worksheetTitle": "Sheet1",
+                  "data": "jobs_tabular.csv",
+                  "minCol": 1
+                }
+              }
+            ]
+        env:
+          GSHEET_CLIENT_EMAIL: ${{ secrets.GSHEET_CLIENT_EMAIL }}
+          GSHEET_PRIVATE_KEY: ${{ secrets.GSHEET_PRIVATE_KEY }}
