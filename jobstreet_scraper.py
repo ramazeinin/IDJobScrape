@@ -109,7 +109,7 @@ async def scrape_jobstreet(client: Client, roles: list[str], max_pages: int = 2)
         "seek-request-country": "ID",
         "x-seek-site": "chalice",
         "x-custom-features": "application/features.seek.all+json",
-    })[cite: 1, 2]
+    })
 
     all_jobs = []
     for role in roles:

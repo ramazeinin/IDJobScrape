@@ -16,7 +16,7 @@ async def main():
     with open(roles_file, "r", encoding="utf-8") as f:
         roles = [line.strip() for line in f if line.strip() and not line.startswith("#")]
 
-    client = Client(emulation=Emulation.Chrome149)[cite: 2]
+    client = Client(emulation=Emulation.Chrome149)
 
     print("[*] Fetching data from Glints...")
     glints_jobs = await scrape_glints(client, roles)
@@ -24,7 +24,7 @@ async def main():
     print("[*] Fetching data from JobStreet...")
     jobstreet_jobs = await scrape_jobstreet(client, roles, max_pages=2)
 
-    client.close()[cite: 2]
+    client.close()
 
     combined_jobs = glints_jobs + jobstreet_jobs
 
@@ -45,10 +45,10 @@ async def main():
         sheet_matrix = [fieldnames] + [
             [str(row.get(k, "")) for k in fieldnames]
             for row in deduped_jobs
-        ][cite: 4]
+        ]
 
         with open(output_gsheet, "w", encoding="utf-8") as f:
-            json.dump(sheet_matrix, f, ensure_ascii=False)[cite: 4]
+            json.dump(sheet_matrix, f, ensure_ascii=False)
 
         print(f"[✓] Successfully exported {len(deduped_jobs)} unified records to {output_gsheet}")
     else:

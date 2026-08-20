@@ -100,7 +100,7 @@ async def scrape_glints(client: Client, roles: list[str]) -> list[dict]:
         "content-type": "application/json",
         "origin": "https://glints.com",
         "x-glints-country-code": "ID",
-    })[cite: 4]
+    })
 
     all_jobs = []
     for role in roles:
