@@ -96,6 +96,7 @@ async def fetch_role_jobs(client: Client, role: str) -> list[dict]:
                 "includeExternalJobs": True,
                 "pageSize": 30,
                 "page": 1,
+                "sortBy": "LATEST",
             }
         },
         "query": GRAPHQL_QUERY,
